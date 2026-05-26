@@ -1,4 +1,4 @@
-﻿# AGC Library Management System
+﻿# LibNova Library Management System
 
 <div align="center">
 
