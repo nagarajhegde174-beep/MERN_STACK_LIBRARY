@@ -1,0 +1,203 @@
+/* ══════════════════════════════════════════════════════
+   FOOTER — MIDNIGHT PURPLE PREMIUM THEME
+   Matches the Admin Dashboard SaaS Aesthetics
+   ══════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+.library-footer {
+  background-color: transparent;
+  color: var(--text-dim, #8b8b9f);
+  padding: 60px 0 20px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--border-color, rgba(255,255,255,0.05));
+  margin-top: 40px;
+}
+
+.footer-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-main {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 40px;
+}
+
+.footer-column {
+  background: var(--bg-card, #16162D);
+  border: 1px solid var(--border-color, rgba(255,255,255,0.05));
+  border-radius: var(--radius-xl, 24px);
+  padding: 2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-column:hover {
+  transform: translateY(-4px);
+  border-color: var(--glass-border, rgba(157, 78, 221, 0.35));
+  box-shadow: var(--shadow-active, 0 14px 40px rgba(157, 78, 221, 0.25));
+}
+
+.footer-heading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main, #F3F4FF);
+  margin-bottom: 1.5rem;
+  padding-bottom: 12px;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footer-heading::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 40px; height: 3px;
+  background: linear-gradient(90deg, var(--primary, #9D4EDD), var(--secondary, #00E5FF));
+  border-radius: 99px;
+}
+
+.footer-about-text {
+  margin-bottom: 20px;
+  line-height: 1.7;
+  color: var(--text-dim, #8b8b9f);
+  font-size: 0.9rem;
+}
+
+.footer-social {
+  display: flex;
+  gap: 12px;
+}
+
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  color: var(--primary, #9D4EDD);
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  background: var(--primary, #9D4EDD);
+  border-color: transparent;
+  color: #fff;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(157, 78, 221, 0.3);
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+}
+
+.footer-link {
+  color: var(--text-dim, #8b8b9f);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.footer-link::before {
+  content: '›';
+  color: var(--secondary, #00E5FF);
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: transform 0.2s ease;
+}
+
+.footer-link:hover {
+  color: var(--text-main, #F3F4FF);
+  transform: translateX(4px);
+}
+
+.footer-link:hover::before {
+  transform: scale(1.2);
+}
+
+.footer-contact-info {
+  list-style: none;
+  padding: 0;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  font-size: 0.9rem;
+  color: var(--text-dim, #8b8b9f);
+}
+
+.contact-icon {
+  margin-right: 12px;
+  color: var(--secondary, #00E5FF);
+  margin-top: 2px;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--border-color, rgba(255,255,255,0.05));
+  padding: 24px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-copyright {
+  color: var(--text-muted, #6b6b80);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.footer-legal {
+  display: flex;
+  gap: 24px;
+}
+
+.legal-link {
+  color: var(--text-muted, #6b6b80);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.legal-link:hover {
+  color: var(--text-dim, #8b8b9f);
+}
+
+@media (max-width: 768px) {
+  .footer-main { grid-template-columns: 1fr 1fr; }
+  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+  .footer-legal { justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .footer-main { grid-template-columns: 1fr; }
+}

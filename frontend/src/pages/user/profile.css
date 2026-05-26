@@ -1,0 +1,359 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.student-profile-page {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: calc(100vh - 72px);
+  padding: 2.5rem 1.5rem 3rem;
+  background: #0b1120;
+  color: #F8FAFC;
+  position: relative;
+  z-index: 1;
+}
+
+.student-profile-page::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.05), transparent 40%),
+              radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.05), transparent 40%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.student-profile-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.student-profile-hero {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.student-profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.student-profile-avatar {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 1rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #8B5CF6, #EC4899);
+  color: #fff;
+  font-size: 3.5rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 32px rgba(139, 92, 246, 0.3);
+  text-transform: uppercase;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  z-index: 2;
+}
+
+.student-profile-avatar:hover {
+  transform: translateY(-10px) scale(1.1) rotate(5deg);
+  box-shadow: 0 25px 50px rgba(236, 72, 153, 0.5), 0 0 0 4px rgba(139, 92, 246, 0.3);
+  border-radius: 28px;
+}
+
+.student-profile-hero h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #F8FAFC;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.35rem;
+  text-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+
+.student-profile-hero p {
+  color: #94A3B8;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.student-profile-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+}
+
+.profile-tab-btn {
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  background: rgba(17, 24, 39, 0.6);
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.profile-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #F8FAFC;
+}
+
+.profile-tab-btn.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+  color: #fff;
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+.profile-tab-badge {
+  background: #EF4444;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.student-profile-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.student-profile-card {
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.student-profile-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 14px 36px rgba(139, 92, 246, 0.15);
+}
+
+.student-profile-card-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.student-profile-card-label svg {
+  color: #8B5CF6;
+}
+
+.student-profile-card-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #F8FAFC;
+  word-break: break-word;
+}
+
+.student-profile-card-value.capitalize {
+  text-transform: capitalize;
+}
+
+.student-profile-notifications {
+  animation: fadeInUp 0.5s ease;
+}
+
+.notification-item {
+  padding: 1.25rem;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.notification-item:hover {
+  transform: translateX(4px);
+}
+
+.notification-item.fulfilled {
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.notification-item.fulfilled svg { color: #10B981; }
+
+.notification-item.pending {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+.notification-item.pending svg { color: #F59E0B; }
+
+.notification-title {
+  margin: 0;
+  color: #F8FAFC;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.notification-desc {
+  margin: 4px 0 0;
+  color: #94A3B8;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.notification-desc strong {
+  color: #E2E8F0;
+}
+
+.student-profile-loading {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: #0b1120;
+}
+
+.student-profile-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid rgba(139, 92, 246, 0.2);
+  border-top-color: #8B5CF6;
+  border-radius: 50%;
+  animation: studentProfileSpin 0.8s linear infinite;
+}
+
+.student-profile-loading p {
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+@keyframes studentProfileSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .student-profile-page {
+    padding: 1.5rem 1rem 2rem;
+  }
+}
+
+/* My Books Tab Styles */
+.borrow-item {
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  gap: 16px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.borrow-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.borrow-cover {
+  width: 70px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.borrow-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.borrow-title {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.borrow-author {
+  margin: 0 0 10px 0;
+  font-size: 0.85rem;
+  color: #94A3B8;
+}
+
+.borrow-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: #CBD5E1;
+}
+
+.borrow-status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.borrow-status.issued {
+  background: rgba(139, 92, 246, 0.15);
+  color: #C4B5FD;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.borrow-status.returned {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6EE7B7;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.borrow-fine {
+  color: #F87171;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
