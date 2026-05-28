@@ -14,6 +14,8 @@ const BookSchema = new Schema({
   coverImage: { type: String },
   cloudinaryId: { type: String, default: "" },
   price: { type: Number },
+  views: { type: Number, default: 0 },
+  rating: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });
 

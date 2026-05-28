@@ -6,7 +6,16 @@ import api from "../../lib/api";
 
 export default function Home() {
   const [data, setData] = useState(null);
+  const [userStats, setUserStats] = useState({
+    activeBorrows: 0,
+    overdue: 0,
+    reservations: 0,
+    activeBorrowsList: [],
+    timelineEvents: []
+  });
   const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem("authToken");
 
   useEffect(() => {
     let alive = true;
@@ -14,6 +23,73 @@ export default function Home() {
       try {
         const res = await api.get("/home");
         if (alive) setData(res.data?.data || res.data || {});
+        
+        if (token) {
+           const headers = { Authorization: `Bearer ${token}` };
+           const [borrowsRes, reservationsRes] = await Promise.all([
+             api.get(`/users/myborrows`, { headers }).catch(() => ({ data: { borrows: [] } })),
+             api.get(`/reservations/my`, { headers }).catch(() => ({ data: { reservations: [] } }))
+           ]);
+           const borrowsData = borrowsRes.data?.borrows || borrowsRes.data?.requests || [];
+           const reservationsData = reservationsRes.data?.reservations || [];
+           
+           let activeBorrows = 0;
+           let overdue = 0;
+           let activeBorrowsList = [];
+           let timelineEvents = [];
+           
+           borrowsData.forEach(b => {
+             if (b.status === "Issued") {
+               activeBorrows++;
+               if (b.bookId) activeBorrowsList.push(b.bookId);
+               
+               const dueDate = new Date(b.dueDate);
+               const now = new Date();
+               const diffDays = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+               
+               if (diffDays < 0) {
+                 overdue++;
+                 timelineEvents.push({
+                   id: `overdue-${b._id}`,
+                   type: 'reminder',
+                   text: `"${b.bookId?.title || 'A book'}" is overdue by ${Math.abs(diffDays)} days.`,
+                   time: 'Urgent',
+                   color: '#EF4444'
+                 });
+               } else if (diffDays <= 2) {
+                 timelineEvents.push({
+                   id: `duesoon-${b._id}`,
+                   type: 'reminder',
+                   text: `"${b.bookId?.title || 'A book'}" is due in ${diffDays} days.`,
+                   time: 'Soon',
+                   color: '#F59E0B'
+                 });
+               }
+             }
+           });
+
+           const activeReservations = reservationsData.filter(
+             r => r.status === "Pending" || r.status === "Notified"
+           ).length;
+
+           reservationsData.forEach(r => {
+             if (r.status === "Notified") {
+               timelineEvents.push({
+                 id: `res-${r._id}`,
+                 type: 'success',
+                 text: `Reservation approved for "${r.bookId?.title || 'a book'}".`,
+                 time: 'Update',
+                 color: '#EC4899'
+               });
+             }
+           });
+           
+           if(alive) {
+             setUserStats({
+               activeBorrows, overdue, reservations: activeReservations, activeBorrowsList, timelineEvents
+             });
+           }
+        }
       } catch (e) {
         console.error("Failed to load home data", e);
       } finally {
@@ -21,7 +97,7 @@ export default function Home() {
       }
     })();
     return () => (alive = false);
-  }, []);
+  }, [token]);
 
   if (loading) {
     return (
@@ -32,23 +108,42 @@ export default function Home() {
   }
 
   const books = Array.isArray(data?.books) ? data.books : [];
-  const continueReadingBooks = books.slice(0, 3);
+  const continueReadingBooks = token ? userStats.activeBorrowsList : [];
   const trendingBooks = books.slice(2, 8);
   const newArrivals = books.slice(5, 12);
   
-  const stats = [
-    { title: "Books Issued", value: data?.issuedCount || data?.totalIssued || 12, icon: BookOpen, color: "#8B5CF6", size: "large" },
-    { title: "Reading Hours", value: "142h", icon: Clock, color: "#EC4899", size: "small" },
-    { title: "Due Soon", value: "2", icon: Activity, color: "#EF4444", size: "small" },
-    { title: "Reserved", value: "4", icon: Bookmark, color: "#8B5CF6", size: "medium" },
+  const stats = token ? [
+    { title: "Books Issued", value: userStats.activeBorrows, icon: BookOpen, color: "#8B5CF6", size: "large" },
+    { title: "Overdue", value: userStats.overdue, icon: Activity, color: "#EF4444", size: "small" },
+    { title: "Reserved", value: userStats.reservations, icon: Bookmark, color: "#8B5CF6", size: "medium" },
+  ] : [
+    { title: "Total Library Books", value: data?.booksCount || data?.totalBooks || 0, icon: BookOpen, color: "#8B5CF6", size: "large" },
+    { title: "Active Users", value: data?.borrowersCount || data?.totalActiveStudents || 0, icon: Users, color: "#EC4899", size: "small" },
+    { title: "Books Issued", value: data?.issuedCount || data?.totalIssued || 0, icon: Activity, color: "#EF4444", size: "small" },
+    { title: "Categories", value: data?.categoriesCount || data?.totalCategories || 0, icon: Bookmark, color: "#8B5CF6", size: "medium" },
   ];
 
-  const mockTimeline = [
-    { id: 1, type: 'reminder', text: 'Clean Architecture is due tomorrow.', time: '2h ago', color: '#EF4444' },
-    { id: 2, type: 'success', text: 'Reservation approved for "Design Patterns".', time: '5h ago', color: '#EC4899' },
-    { id: 3, type: 'info', text: 'You achieved a 7-day reading streak! 🔥', time: '1d ago', color: '#F59E0B' },
-    { id: 4, type: 'update', text: '24 new books added in Computer Science.', time: '2d ago', color: '#8B5CF6' },
-  ];
+  let dynamicTimeline = token ? (userStats.timelineEvents || []) : [];
+  
+  if (books.length > 0 && dynamicTimeline.length < 3) {
+    dynamicTimeline.push({
+      id: 'new-books',
+      type: 'update',
+      text: `${books.length} new books available in the library.`,
+      time: 'New',
+      color: '#8B5CF6'
+    });
+  }
+
+  if (dynamicTimeline.length === 0) {
+    dynamicTimeline.push({
+      id: 'welcome',
+      type: 'info',
+      text: 'Welcome to LibNova! Start exploring books.',
+      time: 'Now',
+      color: '#8B5CF6'
+    });
+  }
 
   return (
     <div style={styles.page}>
@@ -95,13 +190,6 @@ export default function Home() {
               style={styles.heroImgWrapper}
             >
               {/* Floating Overlays */}
-              <motion.div 
-                animate={{ y: [0, -10, 0] }} 
-                transition={{ repeat: Infinity, duration: 4 }} 
-                style={styles.streakOverlay}
-              >
-                🔥 14 Day Streak
-              </motion.div>
               <img src="/student-3d.png" alt="Student" style={styles.heroImg} />
             </motion.div>
           </div>
@@ -144,26 +232,28 @@ export default function Home() {
           <div style={styles.leftCol}>
             
             {/* Continue Reading */}
-            <section style={styles.section}>
-              <div style={styles.sectionHeader}>
-                <h2 style={styles.sectionTitle}>Continue Reading</h2>
-                <Link to="/my-books" style={styles.viewAll}>View All</Link>
-              </div>
-              <div style={styles.horizontalScroll}>
-                {continueReadingBooks.map((b, i) => (
-                  <motion.div key={i} whileHover={{ y: -5 }} style={styles.continueCard}>
-                    <img src={b.coverImage || "https://via.placeholder.com/150"} alt={b.title} style={styles.continueImg} />
-                    <div style={styles.continueOverlay}>
-                      <div style={styles.progressTrack}>
-                        <div style={{...styles.progressBar, width: `${Math.random() * 60 + 20}%`}} />
+            {continueReadingBooks.length > 0 && (
+              <section style={styles.section}>
+                <div style={styles.sectionHeader}>
+                  <h2 style={styles.sectionTitle}>Continue Reading</h2>
+                  <Link to="/my-books" style={styles.viewAll}>View All</Link>
+                </div>
+                <div style={styles.horizontalScroll}>
+                  {continueReadingBooks.map((b, i) => (
+                    <motion.div key={i} whileHover={{ y: -5 }} style={styles.continueCard}>
+                      <img src={b.coverImage || "https://via.placeholder.com/150"} alt={b.title} style={styles.continueImg} />
+                      <div style={styles.continueOverlay}>
+                        <div style={styles.progressTrack}>
+                          <div style={{...styles.progressBar, width: `${((i + 1) * 20) % 60 + 20}%`}} />
+                        </div>
+                        <h4 style={styles.cardTitle}>{b.title}</h4>
+                        <p style={styles.cardAuthor}>{b.author}</p>
                       </div>
-                      <h4 style={styles.cardTitle}>{b.title}</h4>
-                      <p style={styles.cardAuthor}>{b.author}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </section>
+                    </motion.div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* Trending / Netflix Style */}
             <section style={styles.section}>
@@ -196,10 +286,10 @@ export default function Home() {
                 <h2 style={styles.sectionTitle}>Activity & Alerts</h2>
               </div>
               <div style={styles.timelineCard}>
-                {mockTimeline.map((item, idx) => (
+                {dynamicTimeline.map((item, idx) => (
                   <div key={item.id} style={styles.timelineItem}>
                     {/* Vertical line connecting dots */}
-                    {idx !== mockTimeline.length - 1 && <div style={styles.timelineLine} />}
+                    {idx !== dynamicTimeline.length - 1 && <div style={styles.timelineLine} />}
                     
                     <div style={{ ...styles.timelineDot, boxShadow: `0 0 10px ${item.color}80`, background: item.color }} />
                     <div style={styles.timelineContent}>

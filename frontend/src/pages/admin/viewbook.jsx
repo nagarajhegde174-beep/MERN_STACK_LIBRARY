@@ -15,6 +15,8 @@ const ViewBooks = () => {
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("newest");
   const [selectedBook, setSelectedBook] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
@@ -31,13 +33,29 @@ const ViewBooks = () => {
 
   useEffect(() => {
     if (!Array.isArray(books)) return;
-    const filtered = books.filter(b => 
+    let filtered = books.filter(b => 
       (b.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (b.author || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (b.isbn || "").includes(searchTerm)
     );
+
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter(b => b.category === categoryFilter);
+    }
+
+    if (sortOrder === "newest") {
+      filtered.sort((a, b) => {
+        if (b.createdAt && a.createdAt) return new Date(b.createdAt) - new Date(a.createdAt);
+        return b._id.localeCompare(a._id);
+      });
+    } else if (sortOrder === "popular") {
+      filtered.sort((a, b) => (b.totalCopies - b.availableCopies) - (a.totalCopies - a.availableCopies));
+    } else if (sortOrder === "title") {
+      filtered.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+    }
+
     setFilteredBooks(filtered);
-  }, [searchTerm, books]);
+  }, [searchTerm, books, categoryFilter, sortOrder]);
 
   const fetchBooks = async () => {
     try {
@@ -123,19 +141,24 @@ const ViewBooks = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <Search size={18} className="search-icon" />
-          <button className="btn-ai-search">
-            <Sparkles size={12} /> AI Search
-          </button>
         </div>
         
-        <select className="filter-dropdown">
+        <select 
+          className="filter-dropdown"
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+        >
           <option value="all">All Categories</option>
-          <option value="fiction">Fiction</option>
-          <option value="non-fiction">Non-Fiction</option>
-          <option value="science">Science</option>
+          {[...new Set(books.map(b => b.category))].filter(Boolean).map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
         </select>
         
-        <select className="filter-dropdown">
+        <select 
+          className="filter-dropdown"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+        >
           <option value="newest">Sort by: Newest</option>
           <option value="popular">Sort by: Popular</option>
           <option value="title">Sort by: Title</option>
@@ -207,10 +230,10 @@ const ViewBooks = () => {
                     </div>
 
                     <div className="pbc-analytics-compact">
-                      <span title="Views"><Eye size={10} /> 1.2k</span>
-                      <span title="Rating"><Star size={10} /> 4.8</span>
+                      <span title="Views"><Eye size={10} /> {book.views || 0}</span>
+                      <span title="Rating"><Star size={10} /> {book.rating || 0}</span>
                       <span title="Copies"><Book size={10} /> {book.totalCopies}</span>
-                      <span title="Trending" style={{ color: '#00FFB2' }}><TrendingUp size={10} /></span>
+                      {book.views > 100 && <span title="Trending" style={{ color: '#00FFB2' }}><TrendingUp size={10} /></span>}
                     </div>
                   </div>
 

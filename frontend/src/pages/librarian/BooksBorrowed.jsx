@@ -34,24 +34,7 @@ export default function BooksBorrowed() {
     fetchRequests();
   }, []);
 
-  const handleReturnBook = async (id) => {
-    try {
-      const url = Server_URL + "librarian/directreturn/" + id;
-      const response = await axios.put(url, {}, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`
-        }
-      });
-      showSuccessToast(response.data.message || "Book returned successfully!");
-      fetchRequests();
-    } catch (err) {
-      if (err.response) {
-        showErrorToast(err.response.data?.message || err.response.data?.error || "Failed to return book");
-      } else {
-        showErrorToast("Network error: " + err.message);
-      }
-    }
-  };
+
 
   // Filter requests
   const filteredRequests = requests.filter(req => {
@@ -200,24 +183,7 @@ export default function BooksBorrowed() {
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="bb-actions-cell">
-                    <button className="bb-action-btn" title="View Details" onClick={() => showInfoToast("View Details modal coming soon")}>
-                      <Eye size={16} />
-                    </button>
-                    {statusText !== "Returned" && (
-                      <button 
-                        className="bb-action-btn primary" 
-                        title="Force Return Book"
-                        onClick={() => handleReturnBook(req._id)}
-                      >
-                        <RefreshCcw size={16} />
-                      </button>
-                    )}
-                    <button className="bb-action-btn" title="More Options" onClick={() => showInfoToast("More options coming soon")}>
-                      <MoreHorizontal size={16} />
-                    </button>
-                  </div>
+
 
                 </div>
               );

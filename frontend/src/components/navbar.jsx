@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { to: "/category", label: "Categories" },
   { to: "/reservations", label: "Reservations" },
   { to: "/my-books", label: "My Books" },
+  { to: "/aboutus", label: "About Us" },
   { to: "/contactus", label: "Contact Us" },
 ];
 
@@ -39,7 +40,7 @@ export default function Navbar() {
 
           {/* DESKTOP LINKS */}
           <ul style={styles.desktopLinks} className="desktop-nav">
-            {NAV_LINKS.map(link => {
+            {NAV_LINKS.filter(link => token || !['/reservations', '/my-books'].includes(link.to)).map(link => {
               const isActive = location.pathname === link.to;
               return (
                 <li key={link.to} style={{ position: "relative" }}>
@@ -105,7 +106,7 @@ export default function Navbar() {
             )}
 
             {/* Mobile Menu Toggle */}
-            <button style={styles.hamburger} onClick={() => setMenuOpen(!menuOpen)}>
+            <button className="hamburger" style={styles.hamburger} onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? <X size={24} color="#F8FAFC" /> : <Menu size={24} color="#F8FAFC" />}
             </button>
           </div>
@@ -121,7 +122,7 @@ export default function Navbar() {
             exit={{ height: 0, opacity: 0 }}
             style={styles.mobileMenu}
           >
-            {NAV_LINKS.map(link => (
+            {NAV_LINKS.filter(link => token || !['/reservations', '/my-books'].includes(link.to)).map(link => (
               <Link key={link.to} to={link.to} style={styles.mobileLink} onClick={() => setMenuOpen(false)}>
                 {link.label}
               </Link>
@@ -399,6 +400,7 @@ const styles = {
     borderBottom: "1px solid rgba(255,255,255,0.08)",
     overflow: "hidden",
     boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
+    zIndex: 999,
   },
   mobileLink: {
     display: "block",
