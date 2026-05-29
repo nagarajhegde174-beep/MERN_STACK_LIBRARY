@@ -197,10 +197,10 @@ export default function DashboardHome() {
   
   // 1. Borrow Activity (Vertical Bar)
   const barChartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    labels: opStats?.charts?.last6MonthsLabels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     datasets: [{
       label: 'Monthly Borrow Activity',
-      data: [120, 190, 150, 220, 180, 250],
+      data: opStats?.charts?.monthlyBorrows || [0, 0, 0, 0, 0, 0],
       backgroundColor: '#00E5FF',
       borderRadius: 4,
       barThickness: 12,
@@ -217,9 +217,9 @@ export default function DashboardHome() {
 
   // 2. Members Growth (Smooth Line)
   const lineChartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    labels: opStats?.charts?.last6MonthsLabels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     datasets: [{
-      data: [30, 45, 60, 65, 80, 95],
+      data: opStats?.charts?.monthlyMembers || [0, 0, 0, 0, 0, 0],
       borderColor: '#00E5FF',
       backgroundColor: 'rgba(0, 229, 255, 0.1)',
       fill: true,
@@ -241,7 +241,7 @@ export default function DashboardHome() {
   const fineAreaData = {
     labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
     datasets: [{
-      data: [50, 20, 100, 40],
+      data: opStats?.charts?.weeklyFines || [0, 0, 0, 0],
       borderColor: '#FF4D9D',
       backgroundColor: 'rgba(255, 77, 157, 0.2)',
       fill: true,
@@ -257,7 +257,7 @@ export default function DashboardHome() {
     datasets: [
       {
         label: 'Active',
-        data: [5, 10, 8, 15, 12],
+        data: opStats?.charts?.resActive || [0, 0, 0, 0, 0],
         borderColor: '#9D4EDD',
         backgroundColor: 'rgba(157, 78, 221, 0.5)',
         fill: true,
@@ -266,7 +266,7 @@ export default function DashboardHome() {
       },
       {
         label: 'Completed',
-        data: [2, 4, 3, 8, 5],
+        data: opStats?.charts?.resCompleted || [0, 0, 0, 0, 0],
         borderColor: '#00E5FF',
         backgroundColor: 'rgba(0, 229, 255, 0.5)',
         fill: true,

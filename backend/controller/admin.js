@@ -202,6 +202,7 @@ adminController.dashboardStats = async (req, res) => {
   try {
     const { FineModel } = require("../model/FineModel");
     const { ReservationModel } = require("../model/ReservationModel");
+    const { UserModel } = require("../model/UserModel");
 
     const now = new Date();
 
@@ -221,9 +222,74 @@ adminController.dashboardStats = async (req, res) => {
       pendingReservations = await ReservationModel.countDocuments({
         status: "Pending",
       });
-    } catch (_) {
-      // ReservationModel may use a different status field
+    } catch (_) {}
+
+    // --- Dynamic Chart Data Calculations ---
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const last6MonthsLabels = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      last6MonthsLabels.push(monthNames[d.getMonth()]);
     }
+
+    const getMonthIndex = (date) => {
+      const d = new Date(date);
+      const monthsDiff = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+      return 5 - monthsDiff;
+    };
+
+    // 1. Borrow Activity
+    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+    const recentBorrows = await BorrowModel.find({ createdAt: { $gte: sixMonthsAgo } });
+    const monthlyBorrows = [0, 0, 0, 0, 0, 0];
+    recentBorrows.forEach(b => {
+      const idx = getMonthIndex(b.createdAt);
+      if (idx >= 0 && idx < 6) monthlyBorrows[idx]++;
+    });
+
+    // 2. Members Growth
+    const recentMembers = await UserModel.find({ createdAt: { $gte: sixMonthsAgo }, role: "user" });
+    const initialMembers = await UserModel.countDocuments({ createdAt: { $lt: sixMonthsAgo }, role: "user" });
+    let currentTotal = initialMembers;
+    const membersByMonth = [0, 0, 0, 0, 0, 0];
+    recentMembers.forEach(m => {
+      const idx = getMonthIndex(m.createdAt);
+      if (idx >= 0 && idx < 6) membersByMonth[idx]++;
+    });
+    const monthlyMembers = [0, 0, 0, 0, 0, 0];
+    for (let i = 0; i < 6; i++) {
+      currentTotal += membersByMonth[i];
+      monthlyMembers[i] = currentTotal;
+    }
+
+    // 3. Fine Analytics (Last 4 weeks)
+    const fourWeeksAgo = new Date();
+    fourWeeksAgo.setDate(now.getDate() - 28);
+    const recentFines = await FineModel.find({ date: { $gte: fourWeeksAgo } });
+    const weeklyFines = [0, 0, 0, 0];
+    recentFines.forEach(f => {
+      const daysDiff = Math.floor((now - new Date(f.date)) / (1000 * 60 * 60 * 24));
+      const weekIdx = 3 - Math.floor(daysDiff / 7);
+      if (weekIdx >= 0 && weekIdx < 4) weeklyFines[weekIdx] += f.amount;
+    });
+
+    // 4. Reservations (Mon-Fri)
+    const tempNow = new Date();
+    const dayOfWeek = tempNow.getDay();
+    const diffToMon = tempNow.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    const startOfWeek = new Date(tempNow.setDate(diffToMon));
+    startOfWeek.setHours(0, 0, 0, 0);
+    const weekReservations = await ReservationModel.find({ reservationDate: { $gte: startOfWeek } });
+    const resActive = [0, 0, 0, 0, 0];
+    const resCompleted = [0, 0, 0, 0, 0];
+    weekReservations.forEach(r => {
+      const dayIdx = new Date(r.reservationDate).getDay() - 1; // Mon=0
+      if (dayIdx >= 0 && dayIdx < 5) {
+        if (["Pending", "Notified"].includes(r.status)) resActive[dayIdx]++;
+        else if (r.status === "Fulfilled") resCompleted[dayIdx]++;
+      }
+    });
 
     res.status(200).json({
       error: false,
@@ -231,6 +297,14 @@ adminController.dashboardStats = async (req, res) => {
       unpaidFines,
       pendingReturns,
       pendingReservations,
+      charts: {
+        last6MonthsLabels,
+        monthlyBorrows,
+        monthlyMembers,
+        weeklyFines,
+        resActive,
+        resCompleted
+      }
     });
   } catch (err) {
     console.error("dashboardStats ERROR:", err);
